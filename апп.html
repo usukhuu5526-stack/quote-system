@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Үнийн Санал Систем</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #242424;
+  --border: #2e2e2e;
+  --accent: #c8f060;
+  --accent-dim: #a8d040;
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --red: #ff5555;
+  --radius: 8px;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
+input,textarea,select{font-family:var(--sans);font-size:14px}
+
+/* LOGIN */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background: radial-gradient(ellipse at 30% 50%, #1a2a0a 0%, #0f0f0f 60%);
+}
+.login-box{
+  width:340px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:2.5rem;
+  background:var(--surface);
+}
+.login-logo{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--accent);
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  margin-bottom:2rem;
+}
+.login-title{font-size:22px;font-weight:500;margin-bottom:0.5rem}
+.login-sub{color:var(--text2);font-size:13px;margin-bottom:2rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;letter-spacing:0.05em}
+.field input{
+  width:100%;padding:10px 14px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);outline:none;transition:border .2s;
+}
+.field input:focus{border-color:var(--accent)}
+.login-error{color:var(--red);font-size:12px;margin-bottom:1rem;display:none}
+.btn-login{
+  width:100%;padding:11px;
+  background:var(--accent);color:#0f0f0f;
+  border:none;border-radius:var(--radius);
+  font-family:var(--sans);font-size:14px;font-weight:600;
+  cursor:pointer;transition:background .2s;
+}
+.btn-login:hover{background:var(--accent-dim)}
+
+/* APP SHELL */
+#app{display:none;min-height:100vh}
+.sidebar{
+  width:220px;position:fixed;top:0;left:0;bottom:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0;z-index:10;
+}
+.sidebar-logo{
+  padding:1.5rem 1.25rem 1rem;
+  font-family:var(--mono);font-size:10px;color:var(--accent);
+  letter-spacing:0.15em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo span{display:block;font-size:18px;font-family:var(--sans);font-weight:600;color:var(--text);letter-spacing:0;text-transform:none;margin-top:4px}
+nav{flex:1;padding:1rem 0.75rem}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:var(--radius);
+  color:var(--text2);cursor:pointer;transition:all .15s;
+  font-size:13px;font-weight:400;
+  margin-bottom:2px;
+}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent);color:#0f0f0f;font-weight:600}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-bottom{padding:1rem 0.75rem;border-top:1px solid var(--border)}
+.logout-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:var(--radius);
+  color:var(--text3);cursor:pointer;font-size:12px;
+  transition:color .15s;
+}
+.logout-btn:hover{color:var(--red)}
+
+.main{margin-left:220px;min-height:100vh;padding:2rem}
+.page{display:none}
+.page.active{display:block}
+
+/* HEADER */
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;
+}
+.page-title{font-size:20px;font-weight:600}
+.page-sub{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* BUTTONS */
+.btn{
+  padding:8px 16px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);cursor:pointer;font-family:var(--sans);font-size:13px;
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--text3);background:var(--surface)}
+.btn-accent{background:var(--accent);color:#0f0f0f;border-color:var(--accent);font-weight:600}
+.btn-accent:hover{background:var(--accent-dim);border-color:var(--accent-dim)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-danger{color:var(--red);border-color:transparent;background:transparent}
+.btn-danger:hover{background:#ff555520;border-color:#ff555540}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--surface2)}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase}
+td{padding:12px 16px;border-top:1px solid var(--border);color:var(--text);font-size:13px}
+tr:hover td{background:#ffffff05}
+.empty-row td{text-align:center;color:var(--text3);padding:3rem;font-size:13px}
+
+/* BADGE */
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text2);
+}
+.badge-accent{background:#c8f06020;border-color:#c8f06060;color:var(--accent)}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:#00000080;
+  z-index:100;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:2rem;width:460px;max-width:90vw;
+}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:1.5rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.form-grid .full{grid-column:1/-1}
+.form-field label{display:block;font-size:11px;color:var(--text2);margin-bottom:5px;letter-spacing:0.05em}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:9px 12px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);outline:none;transition:border .2s;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent)}
+.form-field textarea{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2rem}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.25rem;
+}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:600;font-family:var(--mono)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* QUOTE BUILDER */
+.quote-form{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.5rem;margin-bottom:1.5rem;
+}
+.qty-input{
+  width:72px;padding:6px 8px;text-align:center;
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:var(--mono);
+}
+.qty-input:focus{outline:none;border-color:var(--accent)}
+.quote-total-bar{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
+  margin-top:1rem;
+}
+.total-breakdown{display:flex;gap:2rem}
+.total-item{text-align:right}
+.total-item .lbl{font-size:11px;color:var(--text2)}
+.total-item .val{font-size:15px;font-weight:500;font-family:var(--mono)}
+.total-item.grand .val{font-size:22px;color:var(--accent)}
+
+/* PRINT */
+@media print {
+  .sidebar,.page-header .btn,.no-print{display:none!important}
+  .main{margin-left:0}
+  body{background:#fff;color:#000}
+  .print-area{max-width:100%;padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">QuoteSystem <span>Үнийн санал</span></div>
+    <p class="login-title">Нэвтрэх</p>
+    <p class="login-sub">Системд нэвтэрч орно уу</p>
+    <div class="login-error" id="login-error">Нэвтрэх нэр эсвэл нууц үг буруу байна</div>
+    <div class="field">
+      <label>НЭВТРЭХ НЭР</label>
+      <input type="text" id="inp-user" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>НУУЦ ҮГ</label>
+      <input type="password" id="inp-pass" placeholder="••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Нэвтрэх</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">QuoteSystem <span>Үнийн санал</span></div>
+    <nav>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Хянах самбар
+      </div>
+      <div class="nav-item" onclick="showPage('catalog')" id="nav-catalog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Каталог
+      </div>
+      <div class="nav-item" onclick="showPage('quotes')" id="nav-quotes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Үнийн саналууд
+      </div>
+      <div class="nav-item" onclick="showPage('new-quote')" id="nav-new-quote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Шинэ санал
+      </div>
+      <div class="nav-item" onclick="showPage('settings')" id="nav-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Тохиргоо
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="logout-btn" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Гарах
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><div class="page-title">Хянах самбар</div><div class="page-sub" id="dash-date"></div></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Нийт бүтээгдэхүүн</div><div class="stat-val" id="stat-products">0</div><div class="stat-sub">Каталогт</div></div>
+        <div class="stat-card"><div class="stat-label">Нийт саналууд</div><div class="stat-val" id="stat-quotes">0</div><div class="stat-sub">Бүгд</div></div>
+        <div class="stat-card"><div class="stat-label">Сүүлийн санал</div><div class="stat-val" id="stat-last">—</div><div class="stat-sub">Харилцагч</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Харилцагч</th><th>Огноо</th><th>Бүтээгдэхүүн</th><th>Нийт дүн</th></tr></thead>
+          <tbody id="dash-table"><tr class="empty-row"><td colspan="4">Одоохондоо санал байхгүй байна</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CATALOG -->
+    <div class="page" id="page-catalog">
+      <div class="page-header">
+        <div><div class="page-title">Каталог</div><div class="page-sub">Тоног төхөөрөмжийн жагсаалт</div></div>
+        <button class="btn btn-accent" onclick="openCatalogModal()">+ Нэмэх</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Нэр</th><th>Ангилал</th><th>Нэгж үнэ</th><th>Тайлбар</th><th></th></tr></thead>
+          <tbody id="catalog-table"><tr class="empty-row"><td colspan="5">Бүтээгдэхүүн нэмнэ үү</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- QUOTES LIST -->
+    <div class="page" id="page-quotes">
+      <div class="page-header">
+        <div><div class="page-title">Үнийн саналууд</div><div class="page-sub">Бүх саналын түүх</div></div>
+        <button class="btn btn-accent" onclick="showPage('new-quote')">+ Шинэ санал</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Харилцагч</th><th>Огноо</th><th>Нийт дүн</th><th></th></tr></thead>
+          <tbody id="quotes-table"><tr class="empty-row"><td colspan="5">Одоохондоо санал байхгүй</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NEW QUOTE -->
+    <div class="page" id="page-new-quote">
+      <div class="page-header">
+        <div><div class="page-title">Шинэ үнийн санал</div><div class="page-sub">Харилцагч болон бүтээгдэхүүн сонгоно уу</div></div>
+      </div>
+      <div class="quote-form">
+        <div class="form-field">
+          <label>ХАРИЛЦАГЧ</label>
+          <input type="text" id="q-client" placeholder="Компанийн нэр">
+        </div>
+        <div class="form-field">
+          <label>ОГНОО</label>
+          <input type="text" id="q-date">
+        </div>
+        <div class="form-field full">
+          <label>ТАЙЛБАР (заавал биш)</label>
+          <input type="text" id="q-note" placeholder="Нэмэлт мэдээлэл...">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Тоног төхөөрөмж</th><th>Ангилал</th><th>Нэгж үнэ</th><th style="text-align:center">Тоо ширхэг</th><th style="text-align:right">Нийт</th></tr></thead>
+          <tbody id="quote-items-table"><tr class="empty-row"><td colspan="5">Каталогт бүтээгдэхүүн нэмнэ үү</td></tr></tbody>
+        </table>
+      </div>
+      <div class="quote-total-bar">
+        <div class="total-breakdown">
+          <div class="total-item"><div class="lbl">Дүн</div><div class="val" id="q-sub">0₮</div></div>
+          <div class="total-item"><div class="lbl">НӨАТ 10%</div><div class="val" id="q-vat">0₮</div></div>
+        </div>
+        <div class="total-item grand"><div class="lbl">Нийт дүн</div><div class="val" id="q-total">0₮</div></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="btn" onclick="showPage('quotes')">Болих</button>
+        <button class="btn btn-accent" onclick="saveQuote()">Хадгалах</button>
+      </div>
+    </div>
+
+    <!-- PRINT VIEW -->
+    <div class="page" id="page-print">
+      <div class="page-header no-print">
+        <div><div class="page-title">Үнийн санал харах</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="showPage('quotes')">← Буцах</button>
+          <button class="btn btn-accent" onclick="window.print()">Хэвлэх / PDF</button>
+        </div>
+      </div>
+      <div id="print-area" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem;max-width:800px"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div><div class="page-title">Тохиргоо</div><div class="page-sub">Системийн тохиргоо</div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:500px">
+        <p style="font-weight:500;margin-bottom:1.25rem">Компанийн мэдээлэл</p>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="form-field full"><label>КОМПАНИЙН НЭР</label><input type="text" id="s-company" placeholder="Таны компани"></div>
+          <div class="form-field full"><label>УТАС</label><input type="text" id="s-phone" placeholder="+976 9900 0000"></div>
+          <div class="form-field full"><label>И-МЭЙЛ</label><input type="text" id="s-email" placeholder="info@company.mn"></div>
+          <div class="form-field full"><label>ХАЯГ</label><input type="text" id="s-addr" placeholder="Улаанбаатар хот..."></div>
+        </div>
+        <p style="font-weight:500;margin:1.5rem 0 1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">Нууц үг солих</p>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="form-field full"><label>ШИНЭ НУУЦ ҮГ</label><input type="password" id="s-newpass" placeholder="••••••"></div>
+          <div class="form-field full"><label>БАТАЛГААЖУУЛАХ</label><input type="password" id="s-confpass" placeholder="••••••"></div>
+        </div>
+        <div id="s-msg" style="font-size:12px;color:var(--accent);margin-bottom:1rem;display:none"></div>
+        <button class="btn btn-accent" onclick="saveSettings()">Хадгалах</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CATALOG MODAL -->
+<div class="modal-overlay" id="catalog-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Бүтээгдэхүүн нэмэх</div>
+    <div class="form-grid">
+      <div class="form-field full"><label>НЭР</label><input type="text" id="m-name" placeholder="Принтер HP LaserJet Pro"></div>
+      <div class="form-field"><label>НЭГЖ ҮНЭ (₮)</label><input type="number" id="m-price" placeholder="0"></div>
+      <div class="form-field"><label>АНГИЛАЛ</label><input type="text" id="m-cat" placeholder="Принтер, Сервер..."></div>
+      <div class="form-field full"><label>ТАЙЛБАР</label><input type="text" id="m-desc" placeholder="Богино тайлбар..."></div>
+    </div>
+    <input type="hidden" id="m-edit-idx" value="-1">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeCatalogModal()">Болих</button>
+      <button class="btn btn-accent" onclick="saveCatalogItem()">Хадгалах</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const KEYS = {cat:'qs_catalog', quotes:'qs_quotes', settings:'qs_settings', pass:'qs_pass'};
+let catalog = [], quotes = [], settings = {};
+const defaultPass = 'admin123';
+
+function load(){
+  try{ catalog = JSON.parse(localStorage.getItem(KEYS.cat)||'[]'); }catch(e){ catalog=[]; }
+  try{ quotes  = JSON.parse(localStorage.getItem(KEYS.quotes)||'[]'); }catch(e){ quotes=[]; }
+  try{ settings= JSON.parse(localStorage.getItem(KEYS.settings)||'{}'); }catch(e){ settings={}; }
+}
+function saveData(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+function fmt(n){ return Math.round(n).toLocaleString('mn-MN')+'₮'; }
+function today(){ return new Date().toLocaleDateString('mn-MN'); }
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function doLogin(){
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pass').value;
+  const pass = localStorage.getItem(KEYS.pass)||defaultPass;
+  if(u==='admin' && p===pass){
+    document.getElementById('login-error').style.display='none';
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    document.getElementById('login-error').style.display='block';
+  }
+}
+document.getElementById('inp-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('inp-user').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('inp-pass').value='';
+}
+
+// ── APP INIT ──────────────────────────────────────────────────────────────────
+function initApp(){
+  load();
+  document.getElementById('q-date').value = today();
+  document.getElementById('dash-date').textContent = today();
+  if(settings.company) document.getElementById('s-company').value=settings.company||'';
+  if(settings.phone)   document.getElementById('s-phone').value=settings.phone||'';
+  if(settings.email)   document.getElementById('s-email').value=settings.email||'';
+  if(settings.addr)    document.getElementById('s-addr').value=settings.addr||'';
+  renderDash(); renderCatalog(); renderQuotes(); renderQuoteItems();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const nav = document.getElementById('nav-'+name);
+  if(nav) nav.classList.add('active');
+  if(name==='new-quote') renderQuoteItems();
+  if(name==='catalog') renderCatalog();
+  if(name==='quotes') renderQuotes();
+  if(name==='dashboard') renderDash();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDash(){
+  document.getElementById('stat-products').textContent = catalog.length;
+  document.getElementById('stat-quotes').textContent = quotes.length;
+  document.getElementById('stat-last').textContent = quotes.length ? quotes[quotes.length-1].client : '—';
+  const tbody = document.getElementById('dash-table');
+  if(!quotes.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="4">Одоохондоо санал байхгүй байна</td></tr>'; return; }
+  tbody.innerHTML = [...quotes].reverse().slice(0,8).map(q=>`
+    <tr><td>${q.client}</td><td>${q.date}</td><td>${q.items.length} төрөл</td><td style="font-family:var(--mono)">${fmt(q.total)}</td></tr>
+  `).join('');
+}
+
+// ── CATALOG ───────────────────────────────────────────────────────────────────
+function renderCatalog(){
+  const tbody = document.getElementById('catalog-table');
+  if(!catalog.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">Бүтээгдэхүүн нэмнэ үү</td></tr>'; return; }
+  tbody.innerHTML = catalog.map((c,i)=>`
+    <tr>
+      <td style="font-weight:500">${c.name}</td>
+      <td><span class="badge">${c.cat||'—'}</span></td>
+      <td style="font-family:var(--mono)">${fmt(c.price)}</td>
+      <td style="color:var(--text2)">${c.desc||'—'}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-ghost" onclick="editCatalog(${i})" style="padding:5px 10px;font-size:12px">Засах</button>
+        <button class="btn btn-danger" onclick="deleteCatalog(${i})" style="padding:5px 10px;font-size:12px">Устгах</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openCatalogModal(){ 
+  document.getElementById('modal-title').textContent='Бүтээгдэхүүн нэмэх';
+  document.getElementById('m-name').value=''; document.getElementById('m-price').value='';
+  document.getElementById('m-cat').value=''; document.getElementById('m-desc').value='';
+  document.getElementById('m-edit-idx').value='-1';
+  document.getElementById('catalog-modal').classList.add('open');
+}
+function editCatalog(i){
+  const c=catalog[i];
+  document.getElementById('modal-title').textContent='Бүтээгдэхүүн засах';
+  document.getElementById('m-name').value=c.name; document.getElementById('m-price').value=c.price;
+  document.getElementById('m-cat').value=c.cat||''; document.getElementById('m-desc').value=c.desc||'';
+  document.getElementById('m-edit-idx').value=i;
+  document.getElementById('catalog-modal').classList.add('open');
+}
+function closeCatalogModal(){ document.getElementById('catalog-modal').classList.remove('open'); }
+function saveCatalogItem(){
+  const name=document.getElementById('m-name').value.trim();
+  const price=parseFloat(document.getElementById('m-price').value)||0;
+  const cat=document.getElementById('m-cat').value.trim();
+  const desc=document.getElementById('m-desc').value.trim();
+  if(!name||!price){ alert('Нэр болон үнэ заавал шаардлагатай'); return; }
+  const idx=parseInt(document.getElementById('m-edit-idx').value);
+  if(idx>=0) catalog[idx]={name,price,cat,desc};
+  else catalog.push({name,price,cat,desc});
+  saveData(KEYS.cat,catalog); closeCatalogModal(); renderCatalog(); renderQuoteItems();
+}
+function deleteCatalog(i){ if(confirm('Устгах уу?')){ catalog.splice(i,1); saveData(KEYS.cat,catalog); renderCatalog(); renderQuoteItems(); } }
+
+// ── QUOTE BUILDER ─────────────────────────────────────────────────────────────
+function renderQuoteItems(){
+  const tbody = document.getElementById('quote-items-table');
+  if(!catalog.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">Каталогт бүтээгдэхүүн нэмнэ үү</td></tr>'; updateTotals(); return; }
+  tbody.innerHTML = catalog.map((c,i)=>`
+    <tr>
+      <td style="font-weight:500">${c.name}</td>
+      <td><span class="badge">${c.cat||'—'}</span></td>
+      <td style="font-family:var(--mono)">${fmt(c.price)}</td>
+      <td style="text-align:center"><input class="qty-input" type="number" min="0" value="0" id="qi-${i}" oninput="updateTotals()"></td>
+      <td style="text-align:right;font-family:var(--mono)" id="qil-${i}">—</td>
+    </tr>
+  `).join('');
+  updateTotals();
+}
+function updateTotals(){
+  let sub=0;
+  catalog.forEach((c,i)=>{
+    const qty=parseInt(document.getElementById('qi-'+i)?.value||0)||0;
+    const line=c.price*qty;
+    sub+=line;
+    const el=document.getElementById('qil-'+i);
+    if(el) el.textContent = qty>0 ? fmt(line) : '—';
+  });
+  const vat=sub*0.1, total=sub+vat;
+  document.getElementById('q-sub').textContent=fmt(sub);
+  document.getElementById('q-vat').textContent=fmt(vat);
+  document.getElementById('q-total').textContent=fmt(total);
+}
+function saveQuote(){
+  const client=document.getElementById('q-client').value.trim();
+  if(!client){ alert('Харилцагчийн нэр оруулна уу'); return; }
+  const items=[];
+  let sub=0;
+  catalog.forEach((c,i)=>{
+    const qty=parseInt(document.getElementById('qi-'+i)?.value||0)||0;
+    if(qty>0){ const line=c.price*qty; sub+=line; items.push({name:c.name,cat:c.cat,price:c.price,qty,line}); }
+  });
+  if(!items.length){ alert('Тоо ширхэг оруулна уу'); return; }
+  const vat=sub*0.1, total=sub+vat;
+  const q={id:Date.now(), client, date:document.getElementById('q-date').value||today(), note:document.getElementById('q-note').value, items, sub, vat, total};
+  quotes.push(q); saveData(KEYS.quotes,quotes);
+  printQuote(q); showPage('print');
+}
+
+// ── QUOTES LIST ───────────────────────────────────────────────────────────────
+function renderQuotes(){
+  const tbody=document.getElementById('quotes-table');
+  if(!quotes.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">Одоохондоо санал байхгүй</td></tr>'; return; }
+  tbody.innerHTML=[...quotes].reverse().map((q,ri)=>`
+    <tr>
+      <td style="color:var(--text2);font-family:var(--mono)">#${quotes.length-ri}</td>
+      <td style="font-weight:500">${q.client}</td>
+      <td>${q.date}</td>
+      <td style="font-family:var(--mono)">${fmt(q.total)}</td>
+      <td><button class="btn btn-ghost" onclick="viewQuote(${quotes.length-1-ri})" style="padding:5px 12px;font-size:12px">Харах</button></td>
+    </tr>
+  `).join('');
+}
+function viewQuote(i){ printQuote(quotes[i]); showPage('print'); }
+
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function printQuote(q){
+  const s=settings;
+  const rows=q.items.map((it,i)=>`
+    <tr style="border-top:1px solid #e0e0e0">
+      <td style="padding:10px 12px;color:#111">${i+1}</td>
+      <td style="padding:10px 12px;color:#111;font-weight:500">${it.name}</td>
+      <td style="padding:10px 12px;color:#555;text-align:center">${it.qty}</td>
+      <td style="padding:10px 12px;color:#111;text-align:right;font-family:monospace">${Math.round(it.price).toLocaleString()}₮</td>
+      <td style="padding:10px 12px;color:#111;text-align:right;font-family:monospace;font-weight:600">${Math.round(it.line).toLocaleString()}₮</td>
+    </tr>`).join('');
+  document.getElementById('print-area').innerHTML=`
+    <div style="color:#111;font-family:'DM Sans',sans-serif;background:#fff;padding:0.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:2px solid #111">
+        <div>
+          <div style="font-size:11px;letter-spacing:0.15em;color:#888;text-transform:uppercase;margin-bottom:4px">Үнийн санал</div>
+          <div style="font-size:26px;font-weight:700;color:#111">${s.company||'Таны компани'}</div>
+          <div style="font-size:12px;color:#666;margin-top:6px">${s.phone||''} ${s.email?'· '+s.email:''}</div>
+          <div style="font-size:12px;color:#666">${s.addr||''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em">Огноо</div>
+          <div style="font-size:16px;font-weight:600;margin-top:2px">${q.date}</div>
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-top:12px">Харилцагч</div>
+          <div style="font-size:16px;font-weight:600;margin-top:2px">${q.client}</div>
+        </div>
+      </div>
+      ${q.note?`<div style="background:#f5f5f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#555;margin-bottom:1.5rem">${q.note}</div>`:''}
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f5f5f5">
+            <th style="padding:10px 12px;text-align:left;color:#888;font-weight:500;font-size:11px;text-transform:uppercase">#</th>
+            <th style="padding:10px 12px;text-align:left;color:#888;font-weight:500;font-size:11px;text-transform:uppercase">Нэр</th>
+            <th style="padding:10px 12px;text-align:center;color:#888;font-weight:500;font-size:11px;text-transform:uppercase">Тоо</th>
+            <th style="padding:10px 12px;text-align:right;color:#888;font-weight:500;font-size:11px;text-transform:uppercase">Нэгж үнэ</th>
+            <th style="padding:10px 12px;text-align:right;color:#888;font-weight:500;font-size:11px;text-transform:uppercase">Нийт</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:1.5rem;display:flex;justify-content:flex-end">
+        <div style="min-width:260px">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-top:1px solid #e0e0e0;color:#555"><span>Дүн</span><span style="font-family:monospace">${Math.round(q.sub).toLocaleString()}₮</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-top:1px solid #e0e0e0;color:#555"><span>НӨАТ (10%)</span><span style="font-family:monospace">${Math.round(q.vat).toLocaleString()}₮</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;font-size:16px;font-weight:700;background:#111;color:#fff;border-radius:8px;margin-top:8px"><span>Нийт дүн</span><span style="font-family:monospace">${Math.round(q.total).toLocaleString()}₮</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function saveSettings(){
+  settings.company=document.getElementById('s-company').value;
+  settings.phone=document.getElementById('s-phone').value;
+  settings.email=document.getElementById('s-email').value;
+  settings.addr=document.getElementById('s-addr').value;
+  saveData(KEYS.settings,settings);
+  const np=document.getElementById('s-newpass').value;
+  const cp=document.getElementById('s-confpass').value;
+  const msg=document.getElementById('s-msg');
+  if(np){
+    if(np!==cp){ msg.style.color='var(--red)'; msg.textContent='Нууц үг таарахгүй байна'; msg.style.display='block'; return; }
+    localStorage.setItem(KEYS.pass,np);
+    document.getElementById('s-newpass').value=''; document.getElementById('s-confpass').value='';
+  }
+  msg.style.color='var(--accent)'; msg.textContent='Хадгалагдлаа!'; msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',2000);
+}
+
+// ── CLOSE MODAL ON BG CLICK ───────────────────────────────────────────────────
+document.getElementById('catalog-modal').addEventListener('click', function(e){ if(e.target===this) closeCatalogModal(); });
+</script>
+</body>
+</html>
